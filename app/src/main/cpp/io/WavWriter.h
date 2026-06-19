@@ -1,3 +1,7 @@
 #pragma once
-// PCM16 WAV file writer. Clip length: pre 5s + event + post 5s.
-namespace io {}
+#include <string>
+#include <cstddef>
+namespace io {
+    // float[-1..1] -> 16-bit PCM mono WAV. Returns true on success.
+    bool writeWav(const std::string& path, const float* samples, size_t n, int sampleRate);
+}

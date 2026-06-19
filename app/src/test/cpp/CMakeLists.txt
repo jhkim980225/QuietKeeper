@@ -23,10 +23,12 @@ add_executable(audiocore_tests
     AWeightingTest.cpp
     FrameProcessorTest.cpp
     RingBufferTest.cpp
+    WavWriterTest.cpp
     ${APP_CPP_DIR}/dsp/Decibel.cpp
     ${APP_CPP_DIR}/dsp/AWeighting.cpp
     ${APP_CPP_DIR}/dsp/FrameProcessor.cpp
     ${APP_CPP_DIR}/buffer/RingBuffer.cpp
+    ${APP_CPP_DIR}/io/WavWriter.cpp
 )
 
 # So tests can #include "dsp/Decibel.h".
