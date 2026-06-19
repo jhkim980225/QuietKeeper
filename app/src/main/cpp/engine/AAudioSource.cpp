@@ -1,14 +1,6 @@
 #include "engine/AAudioSource.h"
 #include <android/log.h>
-#include <sys/system_properties.h>
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "AAudioSource", __VA_ARGS__)
-
-// Returns the device's runtime API level (fast, no JNI needed).
-static int deviceApiLevel() {
-    char buf[PROP_VALUE_MAX] = {};
-    __system_property_get("ro.build.version.sdk", buf);
-    return buf[0] ? atoi(buf) : 26;
-}
 
 namespace engine {
 aaudio_data_callback_result_t AAudioSource::onAudioStatic(AAudioStream*, void* ud, void* audio, int32_t n) {
@@ -27,16 +19,15 @@ bool AAudioSource::start() {
     AAudioStreamBuilder_setChannelCount(b, 1);
     AAudioStreamBuilder_setFormat(b, AAUDIO_FORMAT_PCM_FLOAT);
     AAudioStreamBuilder_setPerformanceMode(b, AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
-#if __ANDROID_API__ >= 28
-    // AAUDIO_INPUT_PRESET_UNPROCESSED disables OS DSP (noise suppression, AGC, etc.)
-    // so we receive raw mic samples. Requires API 28+; on older devices we accept the
-    // default preset (VOICE_RECOGNITION) and note the difference in a log.
-    if (deviceApiLevel() >= 28) {
+    // AAUDIO_INPUT_PRESET_UNPROCESSED (API 28+) disables OS DSP (AGC, noise suppression,
+    // echo cancellation) so we capture raw mic samples — essential for accurate dB(A) measurement.
+    // __builtin_available compiles the call in (weak-linked) and guards it at runtime; on
+    // API 26/27 it is skipped and the device default preset is used.
+    if (__builtin_available(android 28, *)) {
         AAudioStreamBuilder_setInputPreset(b, AAUDIO_INPUT_PRESET_UNPROCESSED);
     } else {
-        LOGE("API < 28: UNPROCESSED preset unavailable; using default (VOICE_RECOGNITION)");
+        LOGE("API < 28: UNPROCESSED preset unavailable; using device default preset");
     }
-#endif
     AAudioStreamBuilder_setSharingMode(b, AAUDIO_SHARING_MODE_SHARED);
     AAudioStreamBuilder_setDataCallback(b, onAudioStatic, this);
 
