@@ -8,3 +8,9 @@ build-tests/
 .cxx/
 .kotlin/
 app/.cxx/
+
+# scratch / test artifacts
+*.stackdump
+smoke*.png
+logcat*.txt
+/ui.xml
