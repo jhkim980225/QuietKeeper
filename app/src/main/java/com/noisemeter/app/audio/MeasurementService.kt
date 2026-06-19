@@ -10,17 +10,18 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import androidx.room.Room
 import com.noisemeter.app.data.AppDatabase
 import com.noisemeter.app.data.NoiseEvent
 import com.noisemeter.app.sensor.MovementDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -43,7 +44,7 @@ class MeasurementService : Service(), AudioEngine.Listener {
 
     override fun onCreate() {
         super.onCreate()
-        db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "noise.db").build()
+        db = AppDatabase.getInstance(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -67,22 +68,21 @@ class MeasurementService : Service(), AudioEngine.Listener {
     override fun onEvent(wavPath: String, peakDb: Float, leq: Float) {
         // Called on the engine worker thread (JNI-attached). Persist metadata off the main thread.
         scope.launch {
-            db.noiseEventDao().insert(
-                NoiseEvent(
-                    timestamp = System.currentTimeMillis(),
-                    peakDb = peakDb,
-                    leq = leq,
-                    wavPath = wavPath,
-                    moved = MovementDetector.movedFlag,
-                    tag = null,
-                    note = null,
+            withContext(NonCancellable) {
+                db.noiseEventDao().insert(
+                    NoiseEvent(
+                        timestamp = System.currentTimeMillis(),
+                        peakDb = peakDb, leq = leq, wavPath = wavPath,
+                        moved = MovementDetector.movedFlag, tag = null, note = null,
+                    )
                 )
-            )
+            }
         }
     }
 
     override fun onDestroy() {
         isRunning = false
+        _metrics.value = floatArrayOf(-120f, -120f, -120f)
         scope.cancel()
         engine.stop()
         MovementDetector.stop()

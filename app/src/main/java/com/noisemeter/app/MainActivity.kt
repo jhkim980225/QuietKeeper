@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.room.Room
 import com.noisemeter.app.audio.MeasurementService
 import com.noisemeter.app.data.AppDatabase
 import com.noisemeter.app.data.NoiseEvent
@@ -25,7 +24,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
+        if (savedInstanceState == null) {
+            perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
+        }
         setContent {
             MaterialTheme {
                 Surface {
@@ -34,14 +35,21 @@ class MainActivity : ComponentActivity() {
                     if (showEvents) {
                         LaunchedEffect(Unit) {
                             events = withContext(Dispatchers.IO) {
-                                val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "noise.db").build()
-                                try { db.noiseEventDao().getAll() } finally { db.close() }
+                                AppDatabase.getInstance(applicationContext).noiseEventDao().getAll()
                             }
                         }
                         EventListScreen(events = events, onBack = { showEvents = false })
                     } else {
                         MeasureScreen(
-                            onStart = { startForegroundService(Intent(this@MainActivity, MeasurementService::class.java)) },
+                            onStart = {
+                            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                    this@MainActivity, Manifest.permission.RECORD_AUDIO
+                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                startForegroundService(Intent(this@MainActivity, MeasurementService::class.java))
+                            } else {
+                                perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
+                            }
+                        },
                             onStop = { stopService(Intent(this@MainActivity, MeasurementService::class.java)) },
                             onShowEvents = { showEvents = true }
                         )
