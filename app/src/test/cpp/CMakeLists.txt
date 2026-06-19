@@ -20,7 +20,9 @@ set(APP_CPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../main/cpp)
 add_executable(audiocore_tests
     SanityTest.cpp
     DecibelTest.cpp
+    AWeightingTest.cpp
     ${APP_CPP_DIR}/dsp/Decibel.cpp
+    ${APP_CPP_DIR}/dsp/AWeighting.cpp
 )
 
 # So tests can #include "dsp/Decibel.h".
