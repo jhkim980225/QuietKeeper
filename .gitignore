@@ -1,0 +1,10 @@
+.superpowers/
+local.properties
+/build
+/.gradle
+/app/build
+build-tests/
+*.stackdump
+.cxx/
+.kotlin/
+app/.cxx/
