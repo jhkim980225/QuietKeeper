@@ -24,6 +24,7 @@ static void emitEvent(const std::string& path, float peak, float leq) {
     if (m) {
         jstring jp = env->NewStringUTF(path.c_str());
         env->CallVoidMethod(gListener, m, jp, peak, leq);
+        if (env->ExceptionCheck()) env->ExceptionClear();
         env->DeleteLocalRef(jp);
     }
     env->DeleteLocalRef(cls);
@@ -33,6 +34,10 @@ static void emitEvent(const std::string& path, float peak, float leq) {
 extern "C" JNIEXPORT void JNICALL
 Java_com_noisemeter_app_audio_AudioEngine_nativeStart(JNIEnv* env, jobject /*thiz*/,
         jstring outDir, jfloat offset, jfloat threshold, jobject listener) {
+    // Defensive: if start is called again without stop, tear down the previous session first.
+    if (gSource) { gSource->stop(); gSource.reset(); }
+    if (gEngine) { gEngine.reset(); }
+    if (gListener) { env->DeleteGlobalRef(gListener); gListener = nullptr; }
     gListener = env->NewGlobalRef(listener);
     const char* dir = env->GetStringUTFChars(outDir, nullptr);
     gEngine = std::make_unique<engine::AudioEngine>(std::string(dir), (float)offset, (float)threshold, &emitEvent);
