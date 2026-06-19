@@ -8,7 +8,8 @@ TEST(RingBuffer, OverwritesOldestWhenFull) {
     rb.write(a, 6);              // keeps last 4: 3,4,5,6
     std::vector<float> out = rb.lastN(4);
     ASSERT_EQ(out.size(), 4u);
-    EXPECT_FLOAT_EQ(out[0], 3); EXPECT_FLOAT_EQ(out[3], 6);
+    EXPECT_FLOAT_EQ(out[0], 3); EXPECT_FLOAT_EQ(out[1], 4);
+    EXPECT_FLOAT_EQ(out[2], 5); EXPECT_FLOAT_EQ(out[3], 6);
 }
 TEST(RingBuffer, ExtractPreAndPost) {
     buffer::RingBuffer rb(10);
@@ -27,4 +28,28 @@ TEST(RingBuffer, LastNClampsToFilled) {
     std::vector<float> out = rb.lastN(8);   // only 3 available
     ASSERT_EQ(out.size(), 3u);
     EXPECT_FLOAT_EQ(out[0], 1); EXPECT_FLOAT_EQ(out[2], 3);
+}
+
+TEST(RingBuffer, ResetClearsState) {
+    buffer::RingBuffer rb(4);
+    float a[]={1,2,3,4}; rb.write(a,4);
+    rb.reset();
+    EXPECT_EQ(rb.filled(), 0u);
+    EXPECT_EQ(rb.lastN(4).size(), 0u);
+}
+
+TEST(RingBuffer, ExtractIntoMatchesAllocating) {
+    buffer::RingBuffer rb(10);
+    float pre[]={1,2,3,4,5}; rb.write(pre,5);
+    float post[]={6,7,8}; rb.write(post,3);
+    std::vector<float> out(8, -1.0f);
+    size_t k = rb.extractInto(5, 3, out.data());
+    ASSERT_EQ(k, 8u);
+    EXPECT_FLOAT_EQ(out[0], 1); EXPECT_FLOAT_EQ(out[7], 8);
+}
+
+TEST(RingBuffer, FilledReportsCount) {
+    buffer::RingBuffer rb(10);
+    float a[]={1,2,3}; rb.write(a,3);
+    EXPECT_EQ(rb.filled(), 3u);
 }
