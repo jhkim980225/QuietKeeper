@@ -24,6 +24,7 @@ object MovementDetector : SensorEventListener {
     private var sensorManager: SensorManager? = null
 
     fun start(ctx: Context) {
+        stop()   // idempotent: drop any prior registration before re-registering
         val sm = ctx.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensorManager = sm
         sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let {
