@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>층간소음 측정 앱 — UI 목업</title>
+<style>body{background:#eef2f7;margin:0;padding:24px;font-family:system-ui}h2{color:#1b3354}.subtitle{color:#5b7aa8;margin-bottom:18px}.options{display:none}</style>
+</head><body>
+<h2>전체 흐름 + 이벤트 상세 페이지</h2>
+<p class="subtitle">목록(4)에서 이벤트 클릭 → 상세(4-1). 파형·재생·지도·태그·노트·내보내기. 라이트 블루 글래스.</p>
+
+<style>
+  .phones { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+  .pcol { text-align:center; }
+  .phone { width:268px; border-radius:34px; overflow:hidden; position:relative;
+    box-shadow:0 14px 40px rgba(120,150,200,.28); border:1px solid #e4ecf7; }
+  .bg { position:absolute; inset:0; background:#f3f7fd; z-index:0; }
+  .scr { position:relative; z-index:1; min-height:560px; padding:18px 15px; color:#1b3354; font-family:system-ui; }
+  .statusbar { display:flex; justify-content:space-between; font-size:11px; color:#7089aa; padding:6px 6px 12px; }
+  .glass { background:rgba(255,255,255,.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid #e1e9f5; border-radius:16px; box-shadow:0 2px 10px rgba(120,150,200,.12); }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:5px 11px;
+    border-radius:999px; background:#fff; border:1px solid #dde6f3; color:#2a5187; }
+  .pill.solid { background:#3b82f6; color:#fff; border:none; font-weight:600; }
+  .pill.warn2 { background:#fff4e3; border-color:#f3dcae; color:#b9781b; }
+  .bigbtn { width:100%; padding:14px; border-radius:14px; border:none; font-size:15px;
+    font-weight:700; background:#3b82f6; color:#fff; box-shadow:0 4px 12px rgba(59,130,246,.3); }
+  .bigbtn.alt { background:#fff; color:#2a5187; border:1px solid #dde6f3; box-shadow:none; }
+  .bigbtn.ghost { background:transparent; color:#9bb0cd; border:1px solid #dde6f3; box-shadow:none; font-weight:600; }
+  .scr h3 { margin:5px 4px 12px; font-size:16px; text-align:left; }
+  .capt { margin-top:10px; font-weight:700; color:var(--text,#222); }
+  .sub2 { font-size:12px; color:#7089aa; }
+  .topbar { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .topbar .back { font-size:18px; color:#2a5187; }
+  .topbar .ttl { font-size:15px; font-weight:800; }
+
+  .langtop { text-align:center; margin:6px 0 12px; }
+  .langtop .logo { width:48px; height:48px; border-radius:14px; margin:0 auto 10px; background:#3b82f6; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 6px 16px rgba(59,130,246,.35); }
+  .langtop .ttl2 { font-size:16px; font-weight:800; }
+  .langtop .sub { font-size:11px; color:#7089aa; margin-top:2px; }
+  .search { display:flex; align-items:center; gap:8px; padding:9px 12px; margin-bottom:10px; color:#9bb0cd; font-size:12px; }
+  .langlist { max-height:250px; overflow:auto; padding-right:2px; }
+  .lang { display:flex; align-items:center; justify-content:space-between; padding:10px 13px; margin-bottom:7px; }
+  .lang .name { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .lang .flag { font-size:17px; }
+  .lang.sel { border:1.5px solid #3b82f6; background:rgba(59,130,246,.08); }
+  .lang .check { color:#3b82f6; font-weight:800; }
+  .lblabel { font-size:10px; color:#9bb0cd; text-transform:uppercase; letter-spacing:.5px; margin:4px 4px 6px; text-align:left; }
+
+  .chk { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; margin-bottom:8px; }
+  .chk .l { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .chk .ic { font-size:16px; }
+  .chk .ok { color:#1f9d57; font-weight:800; font-size:12px; }
+  .chk .warn { color:#e08a1e; font-weight:700; font-size:12px; }
+  .set { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; margin-bottom:8px; font-size:13px; }
+  .set .v { font-weight:800; color:#2f6fd6; }
+  .input { padding:11px 14px; margin-bottom:8px; font-size:12px; color:#9bb0cd; }
+
+  .mapcard { overflow:hidden; margin-bottom:8px; padding:0; }
+  .mapview { height:92px; position:relative; background:#e8eef0;
+    background-image:
+      repeating-linear-gradient(0deg, #dfe7ea 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(90deg, #dfe7ea 0 1px, transparent 1px 30px),
+      linear-gradient(115deg, #cfe0d6 0 18%, transparent 18%),
+      linear-gradient(300deg, #cfe0d6 0 22%, transparent 22%); }
+  .mapview.sm { height:74px; }
+  .mapview::before { content:""; position:absolute; left:0; right:0; top:46%; height:7px; background:#fff; transform:rotate(-8deg); }
+  .mapview::after { content:""; position:absolute; top:0; bottom:0; left:58%; width:6px; background:#fff; transform:rotate(6deg); }
+  .mapview .pin { position:absolute; left:50%; top:42%; transform:translate(-50%,-100%); font-size:24px;
+    filter:drop-shadow(0 3px 2px rgba(0,0,0,.25)); z-index:2; }
+  .maprow { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; font-size:12px; }
+  .maprow .addr { display:flex; flex-direction:column; gap:2px; text-align:left; }
+  .maprow .addr b { font-size:12px; }
+  .maprow .edit { color:#3b82f6; font-weight:700; font-size:12px; }
+
+  .gauge { margin:20px auto 6px; width:172px; height:172px; border-radius:50%;
+    background:conic-gradient(#3b82f6 0 62%, #e3eaf5 62% 100%);
+    display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(90,140,230,.2); }
+  .gauge .inner { width:138px; height:138px; border-radius:50%; background:#fff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid #eef3fa; }
+  .dbval { font-size:46px; font-weight:800; line-height:1; }
+  .dbunit { font-size:12px; color:#7089aa; margin-top:4px; letter-spacing:1px; }
+  .metrics { display:flex; justify-content:space-around; margin:13px 6px 16px; padding:11px 0; }
+  .metric .k { font-size:10px; color:#7089aa; text-transform:uppercase; letter-spacing:.5px; }
+  .metric .v { font-size:18px; font-weight:700; }
+
+  .row { display:flex; justify-content:space-between; align-items:center; padding:11px 13px; margin-bottom:8px; }
+  .row.tap { cursor:pointer; }
+  .row .l { display:flex; flex-direction:column; gap:3px; text-align:left; }
+  .t { font-size:11px; color:#7089aa; }
+  .play { color:#2f6fd6; font-weight:700; }
+  .chev { color:#b8c6dd; font-size:16px; }
+  .tagrow { display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; }
+  .tag { font-size:10px; padding:2px 8px; border-radius:7px; background:#eaf1fc; border:1px solid #d6e3f7; color:#2a5187; }
+  .tag.add { color:#9bb0cd; border-style:dashed; background:transparent; }
+  .tag.ai { background:#eafaf2; border-color:#bfe9d2; color:#1f9d57; }
+  .ev-db { font-size:18px; font-weight:800; color:#2f6fd6; }
+  .ev-db small { font-size:10px; color:#7089aa; font-weight:500; }
+  .quota { font-size:11px; color:#7089aa; text-align:center; margin:4px 0 8px; }
+  .adbar { margin-top:8px; padding:14px; border:1px dashed #c7d3e6; border-radius:12px; text-align:center;
+    color:#9bb0cd; font-size:11px; background:repeating-linear-gradient(45deg,#f2f6fc 0 8px,#eef3fb 8px 16px); }
+
+  /* detail: player */
+  .bigdb { text-align:center; margin:4px 0 12px; }
+  .bigdb .n { font-size:44px; font-weight:800; line-height:1; }
+  .bigdb .u { font-size:12px; color:#7089aa; }
+  .bigdb .meta { font-size:12px; color:#7089aa; margin-top:6px; }
+  .player { padding:14px; margin-bottom:10px; }
+  .wave { display:flex; align-items:flex-end; gap:2px; height:46px; margin-bottom:10px; }
+  .wave span { flex:1; background:#bcd3f5; border-radius:2px; }
+  .wave span.on { background:#3b82f6; }
+  .pctrl { display:flex; align-items:center; gap:12px; }
+  .pbtn { width:40px; height:40px; border-radius:50%; background:#3b82f6; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .ptime { font-size:12px; color:#7089aa; }
+  .ptrack { flex:1; height:4px; border-radius:2px; background:#dde7f5; position:relative; }
+  .ptrack::before { content:""; position:absolute; left:0; top:0; bottom:0; width:38%; background:#3b82f6; border-radius:2px; }
+  .note { padding:12px 14px; font-size:12px; color:#33547e; text-align:left; min-height:48px; margin-bottom:10px; }
+  .seclabel { font-size:10px; color:#9bb0cd; text-transform:uppercase; letter-spacing:.5px; margin:6px 4px 6px; text-align:left; }
+  .two { display:flex; gap:9px; }
+  .two .bigbtn { margin:0; }
+
+  .plan { padding:14px; margin-bottom:11px; text-align:left; }
+  .plan.pro { border:1.5px solid #3b82f6; position:relative; background:rgba(59,130,246,.07); }
+  .plan.pro::after { content:"추천"; position:absolute; top:-9px; right:14px; background:#3b82f6; color:#fff;
+    font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; }
+  .plan h4 { margin:0 0 4px; font-size:14px; display:flex; justify-content:space-between; align-items:baseline; }
+  .plan .price { font-size:12px; font-weight:800; color:#2f6fd6; }
+  .plan ul { margin:7px 0 0; padding-left:16px; }
+  .plan li { font-size:11px; color:#33547e; margin:6px 0; }
+  .plan li.off { color:#a9bad3; }
+  .plan li.hi { color:#1f6fb0; font-weight:700; }
+</style>
+
+<div class="phones">
+
+  <!-- 0 언어 선택 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <div class="langtop"><div class="logo">🔊</div><div class="ttl2">Choose language</div>
+          <div class="sub">언어 선택 · 言語 · Idioma · Ngôn ngữ</div></div>
+        <div class="glass search">🔍 Search language…</div>
+        <div class="lblabel">추천</div>
+        <div class="langlist">
+          <div class="glass lang sel"><span class="name"><span class="flag">🇰🇷</span> 한국어</span><span class="check">✓</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇺🇸</span> English</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇯🇵</span> 日本語</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇨🇳</span> 中文 (简体)</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇪🇸</span> Español</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇻🇳</span> Tiếng Việt</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇹🇭</span> ภาษาไทย</span></div>
+          <div class="glass lang"><span class="name"><span class="flag">🇮🇩</span> Bahasa Indonesia</span></div>
+        </div>
+        <button class="bigbtn" style="margin-top:10px;">시작하기</button>
+      </div>
+    </div>
+    <div class="capt">0 · 언어 선택</div>
+  </div>
+
+  <!-- 1 측정 전 준비 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <h3>측정 준비</h3>
+        <p class="sub2" style="margin:-6px 4px 12px;">시작 전 상태를 확인하세요</p>
+        <div class="glass chk"><span class="l"><span class="ic">🎙</span> 외장마이크</span><span class="ok">연결됨 ✓</span></div>
+        <div class="glass chk"><span class="l"><span class="ic">🔧</span> 캘리브레이션</span><span class="ok">적용됨 ✓</span></div>
+        <div class="glass mapcard">
+          <div class="mapview"><span class="pin">📍</span></div>
+          <div class="maprow"><span class="addr"><b>측정 위치</b><span class="sub2">서울 ○○구 ○○동</span></span><span class="edit">위치 조정</span></div>
+        </div>
+        <div class="glass chk"><span class="l"><span class="ic">📐</span> 기기 고정(수평)</span><span class="warn">기울어짐 ⚠</span></div>
+        <div class="glass set"><span>측정 임계값</span><span class="v">55 dB(A)</span></div>
+        <button class="bigbtn">● 측정 시작</button>
+      </div>
+    </div>
+    <div class="capt">1 · 측정 전 (준비)</div>
+  </div>
+
+  <!-- 2 측정 중 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="pill solid">● 측정 중 · 01:23:40</span><span class="pill">🎙</span>
+        </div>
+        <div class="gauge"><div class="inner"><div class="dbval">62</div><div class="dbunit">dB(A)</div></div></div>
+        <div class="glass metrics">
+          <div class="metric"><div class="k">Leq 1분</div><div class="v">48</div></div>
+          <div class="metric"><div class="k">Lmax</div><div class="v">71</div></div>
+          <div class="metric"><div class="k">임계</div><div class="v">55</div></div>
+        </div>
+        <div style="text-align:center; margin-bottom:16px;"><span class="pill">⚠ 기기 이동 감지</span></div>
+        <button class="bigbtn alt">■ 측정 정지</button>
+      </div>
+    </div>
+    <div class="capt">2 · 측정 중</div>
+  </div>
+
+  <!-- 3 정지 후 저장 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <h3>측정 완료 — 저장할까요?</h3>
+        <div class="sumgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div class="glass" style="padding:13px; text-align:left;"><div class="t">측정 시간</div><div style="font-size:21px; font-weight:800;">1:23</div></div>
+          <div class="glass" style="padding:13px; text-align:left;"><div class="t">초과 이벤트</div><div style="font-size:21px; font-weight:800;">7건</div></div>
+          <div class="glass" style="padding:13px; text-align:left;"><div class="t">최고 Lmax</div><div style="font-size:21px; font-weight:800;">71dB</div></div>
+          <div class="glass" style="padding:13px; text-align:left;"><div class="t">평균 Leq</div><div style="font-size:21px; font-weight:800;">42dB</div></div>
+        </div>
+        <div class="glass mapcard">
+          <div class="mapview sm"><span class="pin">📍</span></div>
+          <div class="maprow"><span class="addr"><b>측정 위치</b><span class="sub2">서울 ○○구 ○○동 · 저장됨</span></span></div>
+        </div>
+        <div class="glass input">메모 (선택)</div>
+        <button class="bigbtn">저장</button>
+        <button class="bigbtn ghost" style="margin-top:9px;">저장 안 함 (삭제)</button>
+      </div>
+    </div>
+    <div class="capt">3 · 정지 후 저장</div>
+  </div>
+
+  <!-- 4 이벤트 목록 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <h3>저장된 소음 이벤트</h3>
+        <div class="quota">오늘 재생 <b>2 / 5회</b> 사용 · 무제한은 프로</div>
+        <div class="glass row tap">
+          <div class="l"><span>오늘 21:14</span><span class="t"><span class="play">▶ 재생</span> · 10초</span>
+            <div class="tagrow"><span class="tag">발걸음</span><span class="tag">📝 노트</span></div></div>
+          <div style="display:flex; align-items:center; gap:8px;"><span class="ev-db">71<small>dB</small></span><span class="chev">›</span></div></div>
+        <div class="glass row tap">
+          <div class="l"><span>오늘 20:02 📍</span><span class="t"><span class="play">▶ 재생</span> · 이동</span>
+            <div class="tagrow"><span class="tag">가구끌기</span></div></div>
+          <div style="display:flex; align-items:center; gap:8px;"><span class="ev-db">68<small>dB</small></span><span class="chev">›</span></div></div>
+        <div class="glass row tap">
+          <div class="l"><span>오늘 18:47</span><span class="t"><span class="play">▶ 재생</span> · 10초</span>
+            <div class="tagrow"><span class="tag add">+ 태그</span></div></div>
+          <div style="display:flex; align-items:center; gap:8px;"><span class="ev-db">63<small>dB</small></span><span class="chev">›</span></div></div>
+        <div class="adbar">광고 (무료 플랜) — 프로 전환 시 제거</div>
+      </div>
+    </div>
+    <div class="capt">4 · 이벤트 목록</div>
+  </div>
+
+  <!-- 4-1 이벤트 상세 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <div class="topbar"><span class="back">‹</span><span class="ttl">이벤트 상세</span></div>
+
+        <div class="bigdb">
+          <span class="n">71</span> <span class="u">dB(A) · Lmax</span>
+          <div class="meta">2026-06-20 21:14:08 · Leq 63 dB · 10초</div>
+          <div style="margin-top:8px;"><span class="pill warn2">⚠ 측정 중 기기 이동 감지</span></div>
+        </div>
+
+        <div class="glass player">
+          <div class="wave">
+            <span style="height:30%"></span><span style="height:55%"></span><span class="on" style="height:80%"></span>
+            <span class="on" style="height:95%"></span><span class="on" style="height:70%"></span><span style="height:45%"></span>
+            <span style="height:60%"></span><span style="height:88%"></span><span style="height:50%"></span>
+            <span style="height:35%"></span><span style="height:65%"></span><span style="height:40%"></span>
+            <span style="height:75%"></span><span style="height:30%"></span><span style="height:55%"></span>
+            <span style="height:42%"></span><span style="height:68%"></span><span style="height:33%"></span>
+          </div>
+          <div class="pctrl">
+            <div class="pbtn">▶</div>
+            <span class="ptime">0:03</span>
+            <div class="ptrack"></div>
+            <span class="ptime">0:10</span>
+          </div>
+          <p class="sub2" style="text-align:center; margin:8px 0 0;">오늘 재생 2/5회 · 무제한은 프로</p>
+        </div>
+
+        <div class="glass mapcard">
+          <div class="mapview sm"><span class="pin">📍</span></div>
+          <div class="maprow"><span class="addr"><b>측정 위치</b><span class="sub2">서울 ○○구 ○○동</span></span></div>
+        </div>
+
+        <div class="seclabel">태그</div>
+        <div class="tagrow" style="margin:0 2px 12px;">
+          <span class="tag">발걸음</span>
+          <span class="tag ai">🤖 AI 추천: 뛰는 소리</span>
+          <span class="tag add">+ 추가</span>
+        </div>
+
+        <div class="seclabel">노트</div>
+        <div class="glass note">밤 9시 넘어 윗집 아이 뛰는 소리. 약 10초 지속됨. (탭하여 편집)</div>
+
+        <div class="two">
+          <button class="bigbtn alt" style="flex:1;">↗ 내보내기 <small>(프로)</small></button>
+          <button class="bigbtn ghost" style="flex:1;">삭제</button>
+        </div>
+      </div>
+    </div>
+    <div class="capt">4-1 · 이벤트 상세</div>
+  </div>
+
+  <!-- 5 결제 -->
+  <div class="pcol">
+    <div class="phone"><div class="bg"></div>
+      <div class="scr">
+        <div class="statusbar"><span>9:41</span><span>● ▮</span></div>
+        <h3 style="text-align:center;">플랜 선택</h3>
+        <p class="sub2" style="text-align:center; margin:-4px 0 14px;">측정·저장은 무료, 무제한 재생은 프로</p>
+        <div class="glass plan">
+          <h4>무료 <span class="price">₩0</span></h4>
+          <ul>
+            <li>실시간 dB(A) 측정</li>
+            <li>이벤트 무제한 저장</li>
+            <li>태그·노트</li>
+            <li>원음 재생 <b>하루 5회</b></li>
+            <li class="off">내보내기 미지원</li>
+            <li class="off">광고 표시</li>
+          </ul>
+        </div>
+        <div class="glass plan pro">
+          <h4>프로 <span class="price">₩4,900/월</span></h4>
+          <ul>
+            <li class="hi">무제한 원음 재생</li>
+            <li class="hi">원음 내보내기</li>
+            <li class="hi">광고 제거</li>
+            <li>(추후 클라우드·AI·레포트)</li>
+          </ul>
+        </div>
+        <button class="bigbtn">프로 시작하기</button>
+      </div>
+    </div>
+    <div class="capt">5 · 결제 (린 프로)</div>
+  </div>
+
+</div>
+
+<div class="options" data-multiselect style="margin-top:24px;">
+  <div class="option" data-choice="detail-ok" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>상세 페이지 좋음</h3><p>파형·재생·지도·태그(AI추천)·노트·내보내기</p></div>
+  </div>
+  <div class="option" data-choice="detail-fix" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>상세 구성 조정</h3><p>항목 추가/제거, 파형 크게 등</p></div>
+  </div>
+  <div class="option" data-choice="go" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content"><h3>전체 확정 → 구현 계획</h3><p>설계 문서 반영 후 writing-plans</p></div>
+  </div>
+</div>
+</body></html>
