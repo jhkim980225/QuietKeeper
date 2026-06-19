@@ -23,3 +23,6 @@ TEST(Decibel, CalibrationOffsetAdds) {
 TEST(Decibel, SilenceClampsToFloor) {
     EXPECT_LE(dsp::toDb(0.0f, 0.0f), -120.0f);
 }
+TEST(Decibel, NearSilenceClampsToFloor) {
+    EXPECT_FLOAT_EQ(dsp::toDb(1e-8f, 0.0f), -120.0f);
+}
