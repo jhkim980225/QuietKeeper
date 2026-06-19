@@ -22,6 +22,11 @@ TEST(WavWriter, WritesValidHeader) {
     EXPECT_EQ(le32(h+24), 48000u);        // sample rate
     EXPECT_EQ(h[34], 16);                 // bits per sample
     EXPECT_EQ(le32(h+40), 48000u*2u);     // data bytes = samples * 2
+
+    FILE* fz = fopen(path.c_str(), "rb"); ASSERT_NE(fz, nullptr);
+    fseek(fz, 0, SEEK_END);
+    EXPECT_EQ(ftell(fz), 44 + (long)(48000 * 2));
+    fclose(fz);
 }
 
 TEST(WavWriter, ClampsAndScalesSample) {
@@ -34,6 +39,8 @@ TEST(WavWriter, ClampsAndScalesSample) {
     int16_t s2 = (int16_t)(buf[48] | (buf[49]<<8));   // 2.0 clamped -> 32767
     EXPECT_EQ(s0, 32767);
     EXPECT_EQ(s2, 32767);
+    int16_t s1 = (int16_t)(buf[46] | (buf[47]<<8));   // -1.0 -> -32767
+    EXPECT_EQ(s1, -32767);
 }
 
 TEST(WavWriter, ReturnsFalseOnBadPath) {
