@@ -29,6 +29,7 @@ class MeasurementService : Service(), AudioEngine.Listener {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val engine = AudioEngine(this)
     private lateinit var db: AppDatabase
+    private var isRunning = false
 
     companion object {
         private val _metrics = MutableStateFlow(floatArrayOf(-120f, -120f, -120f)) // [db, leq, lmax]
@@ -47,7 +48,10 @@ class MeasurementService : Service(), AudioEngine.Listener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForegroundCompat()
-        val outDir = getExternalFilesDir("events")!!.absolutePath
+        if (isRunning) return START_STICKY
+        isRunning = true
+        val outDir = getExternalFilesDir("events")?.absolutePath
+            ?: filesDir.resolve("events").also { it.mkdirs() }.absolutePath
         MovementDetector.reset()
         MovementDetector.start(this)
         engine.start(outDir, CALIBRATION_OFFSET, THRESHOLD_DB)
@@ -78,9 +82,10 @@ class MeasurementService : Service(), AudioEngine.Listener {
     }
 
     override fun onDestroy() {
+        isRunning = false
+        scope.cancel()
         engine.stop()
         MovementDetector.stop()
-        scope.cancel()
         super.onDestroy()
     }
 
