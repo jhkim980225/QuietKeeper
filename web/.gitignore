@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+
+# local env (real secrets) — keep .env.example tracked
+.env
+.env.local
+.env.*.local
+
+# typescript incremental build info
+*.tsbuildinfo
+
+# logs / misc
+*.log
+.DS_Store
+.vite/
