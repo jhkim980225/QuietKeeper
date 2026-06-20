@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">QuietKeeper</string>
+    <!-- Language selection screen -->
+    <string name="choose_language">Choose language</string>
+    <string name="language_subtitle">언어 선택 · 言語 · Idioma · Ngôn ngữ</string>
+    <string name="search_language">🔍 Search language…</string>
+    <string name="start_app">Start</string>
     <string name="measure_title">Measure</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>

@@ -4,8 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Surface
 import androidx.core.content.ContextCompat
@@ -13,7 +13,7 @@ import com.quietkeeper.app.audio.MeasurementService
 import com.quietkeeper.app.ui.AppNav
 import com.quietkeeper.app.ui.theme.QuietKeeperTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val perms = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {}

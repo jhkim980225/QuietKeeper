@@ -3,7 +3,6 @@ package com.quietkeeper.app.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,9 +34,16 @@ import java.io.File
 @Composable
 fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
     val nav = rememberNavController()
-    NavHost(navController = nav, startDestination = "home") {
+    // First launch (no locale chosen yet) → language screen; otherwise straight to home.
+    val startDest = if (AppCompatDelegate.getApplicationLocales().isEmpty) "language" else "home"
+    NavHost(navController = nav, startDestination = startDest) {
         composable("language") {
-            LanguagePlaceholder(onStart = { nav.navigate("home") })
+            LanguageScreen(onChosen = { tag ->
+                // Persists the choice and recreates the activity in the new locale.
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+                // Fallback nav in case no recreate happens (e.g. same-locale selection).
+                nav.navigate("home") { popUpTo("language") { inclusive = true } }
+            })
         }
         composable("home") {
             HomeScreen(
@@ -134,24 +142,6 @@ private fun HomeScreen(onStart: () -> Unit, onStop: () -> Unit, onShowEvents: ()
         onStop = onStop,
         onShowEvents = onShowEvents,
     )
-}
-
-@Composable
-private fun LanguagePlaceholder(onStart: () -> Unit) {
-    ScreenScaffold {
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                "언어 선택 (구현 예정)",
-                style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
-            )
-            Button(onClick = onStart) { Text("시작") }
-        }
-    }
 }
 
 @Composable

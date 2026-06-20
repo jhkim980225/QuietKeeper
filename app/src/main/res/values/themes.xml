@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      AppCompat theme is required because MainActivity extends AppCompatActivity
+      (so AppCompatDelegate.setApplicationLocales persists the per-app locale on all
+      API levels). Visuals are provided by Compose; this is just the host theme.
+    -->
+    <style name="Theme.QuietKeeper" parent="Theme.AppCompat.Light.NoActionBar" />
+</resources>
