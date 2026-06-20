@@ -35,19 +35,21 @@
 
 우선순위 순. 완료 시 [x] 체크.
 
-- [ ] **D-1. 상세 화면 지도 방어적 렌더** — 유효한 Maps 키가 없을 때 `GoogleMap`을 렌더하지 않고
-  주소/좌표 카드만 표시(키 있을 때만 지도). 상세 화면 크래시/빈 지도 동시 해결.
-- [ ] **D-2. GPS 캡처 미작동 조사/수정** — 에뮬레이터에서 lat/lng NULL. `getCurrentLocation` 실패 시
-  `lastLocation` 폴백 추가, 위치 서비스 활성 가정 점검. 실기기 검증 체크리스트에 반영.
-- [ ] **M-1. eventCount 가시성** — `@Volatile`/`AtomicInteger`로 (워커 스레드 증가·폴링 읽기).
-- [ ] **M-2. MediaPlayer `prepareAsync`** — 상세 재생 시 메인스레드 동기 `prepare()` → 비동기로.
-- [ ] **M-3. 미사용 문자열 `detail_ai_suggest` 제거** (AI 작업에서 잔존).
-- [ ] **A-1. 앱 아이콘** — 기본 안드로이드 아이콘 → QuietKeeper 적응형 아이콘(단색 + 모노크롬).
-- [ ] **W-1. 기기 로컬 웹서버(LAN 음원 스트리밍)** — 스펙 2-2. 앱에 내장 HTTP 서버(이벤트 WAV를
-  동일 WiFi에서 스트리밍). 모니터링 웹의 음원 재생 스텁과 연결.
-- [ ] **T-1. 계측 UI 테스트** — 핵심 플로우(준비→측정→저장, 목록→상세) Compose UI 테스트.
-- [ ] **DOC-1. 개인정보처리방침 초안** — 마이크 녹음 + 위치 수집 고지(스토어 필수 요건).
-- [ ] **DOC-2. 캘리브레이션 절차 문서** — 기준 소음계 대조로 오프셋 산출하는 방법.
+- [x] **D-1. 상세 화면 지도 방어적 렌더** — 유효 Maps 키 없으면 `GoogleMap` 미렌더, 주소/좌표만.
+  상세 화면 크래시·빈 지도 동시 해결. (`LocationCard.kt` `mapsKeyConfigured`)
+- [x] **D-2. GPS 캡처 폴백** — `getCurrentLocation` null/실패 시 `lastLocation` 폴백 추가.
+  (에뮬에선 여전히 위치 미제공 가능 — **실기기 검증 필요**, 코드 경로는 보강됨)
+- [x] **M-1. eventCount `@Volatile`**.
+- [x] **M-2. MediaPlayer `prepareAsync`** (+ onPrepared/onError 리스너).
+- [x] **M-3. 미사용 문자열 `detail_ai_suggest` 제거**.
+- [x] **A-1. 앱 아이콘** — QuietKeeper 적응형 아이콘(블루 배경 + 사운드레벨 바, 모노크롬 포함).
+- [x] **W-1. 기기 로컬 웹서버** — NanoHTTPD `LocalStreamServer`(/events, /audio/{file} Range 지원,
+  경로 traversal 차단). 온디바이스 200/206/403 검증. Range 단위테스트 9개.
+- [x] **T-1. 계측 UI 테스트** — Prep/Paywall/EventList/Save Compose UI 테스트 6개, 에뮬 6/6 통과.
+- [x] **DOC-1. 개인정보처리방침 초안** — `docs/PRIVACY_POLICY_DRAFT.md`.
+- [x] **DOC-2. 캘리브레이션 절차 문서** — `docs/CALIBRATION_PROCEDURE.md`.
+
+✅ **섹션 2(코드로 가능한 미처리 개발) 전 항목 완료.** 남은 것은 섹션 3(외부 계정/하드웨어)뿐.
 
 ## 3. 외부 계정·하드웨어 필요 (코드만으로 불가 — 사용자 액션)
 
@@ -64,4 +66,5 @@
 ---
 
 ## 진행 로그
-- 2026-06-21: 검증 수행, 본 백로그 작성. 이후 섹션 2 항목을 순서대로 해결 예정.
+- 2026-06-21: 검증 수행, 본 백로그 작성.
+- 2026-06-21: 섹션 2 전 항목 해결(D-1·D-2·M-1·M-2·M-3·A-1·W-1·T-1·DOC-1·DOC-2). `feat/phase3-hardening`.
