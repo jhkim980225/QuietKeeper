@@ -1,18 +1,13 @@
 package com.quietkeeper.app.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.collectAsState
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,9 +18,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.quietkeeper.app.audio.MeasurementService
 import com.quietkeeper.app.data.AppDatabase
+import com.quietkeeper.app.billing.BillingManager
+import com.quietkeeper.app.billing.ProStatus
 import com.quietkeeper.app.data.NoiseEvent
-import com.quietkeeper.app.ui.theme.ScreenScaffold
-import com.quietkeeper.app.ui.theme.TextPrimary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,6 +49,7 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
                     nav.navigate("save")
                 },
                 onShowEvents = { nav.navigate("events") },
+                onShowPaywall = { nav.navigate("paywall") },
             )
         }
         composable("events") {
@@ -127,12 +123,25 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
                 )
             }
         }
-        composable("paywall") { PlaceholderScreen("Paywall") }
+        composable("paywall") {
+            val activity = LocalContext.current as? Activity
+            val isPro by ProStatus.isPro.collectAsState()
+            PaywallScreen(
+                onBack = { nav.popBackStack() },
+                onSubscribe = { activity?.let { BillingManager.launchPurchase(it) } },
+                isPro = isPro,
+            )
+        }
     }
 }
 
 @Composable
-private fun HomeScreen(onStart: () -> Unit, onStop: () -> Unit, onShowEvents: () -> Unit) {
+private fun HomeScreen(
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    onShowEvents: () -> Unit,
+    onShowPaywall: () -> Unit,
+) {
     // Observe running state so the home screen recomposes with service lifecycle.
     val running by com.quietkeeper.app.audio.MeasurementService.running
         .collectAsStateWithLifecycle()
@@ -141,22 +150,6 @@ private fun HomeScreen(onStart: () -> Unit, onStop: () -> Unit, onShowEvents: ()
         onStart = onStart,
         onStop = onStop,
         onShowEvents = onShowEvents,
+        onShowPaywall = onShowPaywall,
     )
-}
-
-@Composable
-private fun PlaceholderScreen(name: String) {
-    ScreenScaffold {
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                "$name (TODO)",
-                style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
-            )
-        }
-    }
 }

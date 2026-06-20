@@ -30,7 +30,7 @@ fun EventListScreen(events: List<NoiseEvent>, onBack: () -> Unit, onOpen: (Long)
             )
         } else {
             LazyColumn(
-                Modifier.fillMaxSize(),
+                Modifier.weight(1f).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(events) { e ->
@@ -54,5 +54,8 @@ fun EventListScreen(events: List<NoiseEvent>, onBack: () -> Unit, onOpen: (Long)
                 }
             }
         }
+        Spacer(Modifier.height(8.dp))
+        // Free users see a (test) banner here; Pro users see nothing.
+        AdBannerIfFree()
     }
 }

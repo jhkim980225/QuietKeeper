@@ -59,4 +59,27 @@
     <string name="detail_export_pro">↗ 내보내기 (프로)</string>
     <string name="detail_export_pro_toast">프로 전용</string>
     <string name="detail_delete">삭제</string>
+    <!-- Paywall screen -->
+    <string name="pro_entry">프로</string>
+    <string name="paywall_title">플랜 선택</string>
+    <string name="paywall_subtitle">측정·저장은 무료, 무제한 재생은 프로</string>
+    <string name="plan_free_name">무료</string>
+    <string name="plan_free_price">₩0</string>
+    <string name="plan_free_f1">실시간 dB(A) 측정</string>
+    <string name="plan_free_f2">이벤트 무제한 저장</string>
+    <string name="plan_free_f3">태그·노트</string>
+    <string name="plan_free_f4">원음 재생 하루 5회</string>
+    <string name="plan_free_f5">내보내기 미지원</string>
+    <string name="plan_free_f6">광고 표시</string>
+    <string name="plan_pro_name">프로</string>
+    <string name="plan_pro_price">₩4,900/월</string>
+    <string name="plan_pro_badge">추천</string>
+    <string name="plan_pro_f1">무제한 원음 재생</string>
+    <string name="plan_pro_f2">원음 내보내기</string>
+    <string name="plan_pro_f3">광고 제거</string>
+    <string name="plan_pro_f4">(추후 클라우드·AI·레포트)</string>
+    <string name="paywall_subscribe">프로 시작하기</string>
+    <string name="paywall_active">프로 이용 중</string>
+    <string name="paywall_product_unavailable">상품 미설정(개발 중)</string>
+    <string name="paywall_debug_hint">(개발용)</string>
 </resources>

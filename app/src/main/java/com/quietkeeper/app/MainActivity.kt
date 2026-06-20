@@ -9,7 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Surface
 import androidx.core.content.ContextCompat
+import com.google.android.gms.ads.MobileAds
 import com.quietkeeper.app.audio.MeasurementService
+import com.quietkeeper.app.billing.BillingManager
+import com.quietkeeper.app.billing.ProStatus
 import com.quietkeeper.app.ui.AppNav
 import com.quietkeeper.app.ui.theme.QuietKeeperTheme
 
@@ -23,6 +26,19 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
         }
+        // Monetization wiring: ads SDK, Pro source-of-truth, billing connection.
+        MobileAds.initialize(this) {}
+        ProStatus.init(applicationContext)
+        BillingManager.onProductUnavailable = {
+            runOnUiThread {
+                android.widget.Toast.makeText(
+                    this,
+                    getString(R.string.paywall_product_unavailable),
+                    android.widget.Toast.LENGTH_SHORT,
+                ).show()
+            }
+        }
+        BillingManager.connect(applicationContext)
         setContent {
             QuietKeeperTheme {
                 Surface {

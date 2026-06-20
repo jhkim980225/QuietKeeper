@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
@@ -11,6 +12,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.QuietKeeper">
+
+        <!--
+            AdMob application id. This is Google's official PUBLIC TEST app id
+            (safe to commit, no account required). It pairs with the test ad
+            unit ids used in AdBanner.kt.
+            TODO(prod): replace with the real AdMob app id from your AdMob
+            account (ca-app-pub-XXXXXXXX~XXXXXXXX) before production release.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
 
         <activity
             android:name=".MainActivity"

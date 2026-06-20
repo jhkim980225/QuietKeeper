@@ -59,4 +59,27 @@
     <string name="detail_export_pro">↗ Export (Pro)</string>
     <string name="detail_export_pro_toast">Pro only</string>
     <string name="detail_delete">Delete</string>
+    <!-- Paywall screen -->
+    <string name="pro_entry">Pro</string>
+    <string name="paywall_title">Choose a plan</string>
+    <string name="paywall_subtitle">Measuring &amp; saving are free, unlimited playback is Pro</string>
+    <string name="plan_free_name">Free</string>
+    <string name="plan_free_price">₩0</string>
+    <string name="plan_free_f1">Real-time dB(A) measurement</string>
+    <string name="plan_free_f2">Unlimited event saving</string>
+    <string name="plan_free_f3">Tags &amp; notes</string>
+    <string name="plan_free_f4">Original audio playback 5×/day</string>
+    <string name="plan_free_f5">No export</string>
+    <string name="plan_free_f6">Shows ads</string>
+    <string name="plan_pro_name">Pro</string>
+    <string name="plan_pro_price">₩4,900/mo</string>
+    <string name="plan_pro_badge">Recommended</string>
+    <string name="plan_pro_f1">Unlimited original audio playback</string>
+    <string name="plan_pro_f2">Original audio export</string>
+    <string name="plan_pro_f3">Ad-free</string>
+    <string name="plan_pro_f4">(Coming: cloud · AI · reports)</string>
+    <string name="paywall_subscribe">Start Pro</string>
+    <string name="paywall_active">Pro active</string>
+    <string name="paywall_product_unavailable">Product not set up (in development)</string>
+    <string name="paywall_debug_hint">(dev)</string>
 </resources>

@@ -54,6 +54,7 @@ fun MeasureScreen(
     onStart: () -> Unit,
     onStop: () -> Unit,
     onShowEvents: () -> Unit,
+    onShowPaywall: () -> Unit = {},
 ) {
     val m by MeasurementService.metrics.collectAsStateWithLifecycle()
     val summary by MeasurementService.summary.collectAsStateWithLifecycle()
@@ -77,7 +78,12 @@ fun MeasureScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
         ) {
-            Spacer(Modifier.height(8.dp))
+            // Entry point to the paywall.
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                TextButton(onClick = onShowPaywall) {
+                    Text(stringResource(R.string.pro_entry), color = Primary)
+                }
+            }
             Gauge(currentDb = m.current)
             Spacer(Modifier.height(24.dp))
             GlassCard(Modifier.fillMaxWidth()) {
