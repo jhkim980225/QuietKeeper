@@ -104,7 +104,17 @@ dependencies {
     // Embedded LAN streaming server for serving saved event WAVs to viewers on the same WiFi.
     implementation("org.nanohttpd:nanohttpd:2.3.1")
     androidTestImplementation("androidx.room:room-testing:2.6.1")
-    androidTestImplementation("androidx.test:runner:1.5.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    // androidx.test runner/junit/espresso bumped to API 36-compatible versions:
+    // older Espresso reflects InputManager.getInstance(), which was removed on
+    // recent Android (NoSuchMethodException on the API 36 emulator).
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+
+    // Compose UI instrumented tests. Reuse the same Compose BOM applied above so
+    // the test artifacts match the app's Compose version.
+    androidTestImplementation(composeBom)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
