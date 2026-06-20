@@ -13,6 +13,7 @@ import androidx.core.app.ServiceCompat
 import com.quietkeeper.app.R
 import com.quietkeeper.app.data.AppDatabase
 import com.quietkeeper.app.data.NoiseEvent
+import com.quietkeeper.app.location.LocationProvider
 import com.quietkeeper.app.sensor.MovementDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,9 @@ class MeasurementService : Service(), AudioEngine.Listener {
     private var isRunning = false
     private var sessionStart = 0L
     private var eventCount = 0
+
+    // Captured once per session (best-effort). Stamped onto each saved event.
+    @Volatile private var sessionFix: LocationProvider.Fix? = null
 
     data class SessionSummary(
         val durationMs: Long = 0,
@@ -73,6 +77,9 @@ class MeasurementService : Service(), AudioEngine.Listener {
         sessionStart = System.currentTimeMillis()
         eventCount = 0
         _running.value = true
+        // Best-effort, non-blocking location capture; measurement proceeds regardless.
+        sessionFix = null
+        scope.launch { sessionFix = LocationProvider.current(applicationContext) }
         scope.launch {
             while (isActive) {
                 val p = engine.poll()
@@ -96,6 +103,9 @@ class MeasurementService : Service(), AudioEngine.Listener {
                         timestamp = System.currentTimeMillis(),
                         peakDb = peakDb, leq = leq, wavPath = wavPath,
                         moved = MovementDetector.movedFlag, tag = null, note = null,
+                        latitude = sessionFix?.lat,
+                        longitude = sessionFix?.lng,
+                        address = sessionFix?.address,
                     )
                 )
             }

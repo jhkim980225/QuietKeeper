@@ -241,29 +241,8 @@ fun EventDetailScreen(
             }
             Spacer(Modifier.height(16.dp))
 
-            // Map placeholder
-            GlassCard(Modifier.fillMaxWidth()) {
-                Text(
-                    stringResource(R.string.detail_location),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(Modifier.height(8.dp))
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(90.dp)
-                        .background(Color(0xFFE3E8F0), RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        stringResource(R.string.detail_map_pending),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = TextSecondary,
-                    )
-                }
-            }
+            // Measurement location: map preview + reverse-geocoded address.
+            LocationCard(event.latitude, event.longitude, event.address)
             Spacer(Modifier.height(16.dp))
 
             // Tag section

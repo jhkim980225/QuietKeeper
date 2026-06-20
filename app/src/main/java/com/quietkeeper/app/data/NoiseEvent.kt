@@ -12,4 +12,7 @@ data class NoiseEvent(
     val moved: Boolean,
     val tag: String?,
     val note: String?,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val address: String? = null,
 )

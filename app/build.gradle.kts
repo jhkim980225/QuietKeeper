@@ -18,6 +18,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // Google Maps key for live map tiles. Supply via -PMAPS_API_KEY=... or a
+        // gradle.properties / local.properties MAPS_API_KEY entry. Falls back to a
+        // placeholder so the build compiles without a key (map tiles render blank).
+        // TODO: set MAPS_API_KEY for live map tiles.
+        manifestPlaceholders["MAPS_API_KEY"] = (project.findProperty("MAPS_API_KEY") as String?) ?: "YOUR_MAPS_API_KEY"
+
         externalNativeBuild {
             cmake {
                 // Project-wide audio constants documented in native sources:
@@ -85,6 +91,11 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
 
     // Monetization: Play Billing, AdMob, DataStore (debug-pro override storage).
+    // Location capture + map preview.
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.maps.android:maps-compose:6.1.2")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+
     implementation("com.android.billingclient:billing-ktx:7.1.1")
     implementation("com.google.android.gms:play-services-ads:23.5.0")
     implementation("androidx.datastore:datastore-preferences:1.1.1")

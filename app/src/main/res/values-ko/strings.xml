@@ -52,6 +52,9 @@
     <string name="detail_export">↗ 내보내기</string>
     <string name="detail_location">측정 위치</string>
     <string name="detail_map_pending">지도 준비 중</string>
+    <string name="measure_location">측정 위치</string>
+    <string name="measure_location_none">위치 정보 없음</string>
+    <string name="measure_location_coords">위치 좌표 %1$f, %2$f</string>
     <string name="detail_tag_section">태그</string>
     <string name="detail_add_tag">+ 태그 추가</string>
     <string name="detail_ai_suggest">🤖 AI 추천</string>

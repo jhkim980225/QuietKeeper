@@ -52,6 +52,9 @@
     <string name="detail_export">↗ Export</string>
     <string name="detail_location">Measurement location</string>
     <string name="detail_map_pending">Map coming soon</string>
+    <string name="measure_location">Measurement location</string>
+    <string name="measure_location_none">No location info</string>
+    <string name="measure_location_coords">Coordinates %1$f, %2$f</string>
     <string name="detail_tag_section">Tag</string>
     <string name="detail_add_tag">+ Add tag</string>
     <string name="detail_ai_suggest">🤖 AI suggestion</string>
