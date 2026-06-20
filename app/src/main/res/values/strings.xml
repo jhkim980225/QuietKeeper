@@ -48,6 +48,8 @@
     <string name="detail_title">Event detail</string>
     <string name="detail_moved_badge">⚠ Device movement detected during measurement</string>
     <string name="detail_plays_today">Plays today %1$d / %2$d</string>
+    <string name="detail_unlimited_play">Unlimited playback</string>
+    <string name="detail_export">↗ Export</string>
     <string name="detail_location">Measurement location</string>
     <string name="detail_map_pending">Map coming soon</string>
     <string name="detail_tag_section">Tag</string>

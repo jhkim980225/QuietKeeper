@@ -98,9 +98,12 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
                     }
                 }
             }
+            val isPro by ProStatus.isPro.collectAsState()
             event?.let { ev ->
                 EventDetailScreen(
                     event = ev,
+                    isPro = isPro,
+                    onNeedUpgrade = { nav.navigate("paywall") },
                     onBack = { nav.popBackStack() },
                     onSaveNote = { tag, note ->
                         scope.launch {

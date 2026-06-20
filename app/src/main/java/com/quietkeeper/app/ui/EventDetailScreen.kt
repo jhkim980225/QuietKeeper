@@ -1,7 +1,7 @@
 package com.quietkeeper.app.ui
 
+import android.content.Intent
 import android.media.MediaPlayer
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,7 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,8 +42,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import com.quietkeeper.app.R
+import com.quietkeeper.app.billing.PlayQuota
 import com.quietkeeper.app.data.NoiseEvent
+import kotlinx.coroutines.launch
+import java.io.File
 import com.quietkeeper.app.ui.theme.BgLight
 import com.quietkeeper.app.ui.theme.EvDb
 import com.quietkeeper.app.ui.theme.GlassCard
@@ -62,10 +68,31 @@ fun EventDetailScreen(
     onBack: () -> Unit,
     onSaveNote: (tag: String?, note: String?) -> Unit,
     onDelete: () -> Unit,
+    isPro: Boolean,
+    onNeedUpgrade: () -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val player = remember { MediaPlayer() }
     var isPlaying by remember { mutableStateOf(false) }
+
+    // Free users see remaining plays today; bumped after each consume so the
+    // hint counts down. Pro users bypass the quota entirely.
+    var quotaTick by remember { mutableStateOf(0) }
+    val remaining by produceState(initialValue = PlayQuota.FREE_DAILY_LIMIT, isPro, quotaTick) {
+        value = if (isPro) PlayQuota.FREE_DAILY_LIMIT
+        else PlayQuota.remainingToday(context, PlayQuota.todayString())
+    }
+
+    fun startPlayback() {
+        runCatching {
+            player.reset()
+            player.setDataSource(event.wavPath)
+            player.prepare()
+            player.start()
+            isPlaying = true
+        }
+    }
 
     DisposableEffect(Unit) {
         player.setOnCompletionListener { isPlaying = false }
@@ -157,13 +184,17 @@ fun EventDetailScreen(
                                 if (isPlaying) {
                                     runCatching { player.pause() }
                                     isPlaying = false
+                                } else if (isPro) {
+                                    startPlayback()
                                 } else {
-                                    runCatching {
-                                        player.reset()
-                                        player.setDataSource(event.wavPath)
-                                        player.prepare()
-                                        player.start()
-                                        isPlaying = true
+                                    scope.launch {
+                                        val ok = PlayQuota.tryConsume(context, PlayQuota.todayString())
+                                        quotaTick++ // refresh the remaining-plays hint
+                                        if (ok) {
+                                            startPlayback()
+                                        } else {
+                                            onNeedUpgrade()
+                                        }
                                     }
                                 }
                             },
@@ -192,7 +223,16 @@ fun EventDetailScreen(
                         }
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            stringResource(R.string.detail_plays_today, 2, 5),
+                            if (isPro) {
+                                stringResource(R.string.detail_unlimited_play)
+                            } else {
+                                val used = PlayQuota.FREE_DAILY_LIMIT - remaining
+                                stringResource(
+                                    R.string.detail_plays_today,
+                                    used,
+                                    PlayQuota.FREE_DAILY_LIMIT,
+                                )
+                            },
                             style = MaterialTheme.typography.labelLarge,
                             color = TextSecondary,
                         )
@@ -298,15 +338,32 @@ fun EventDetailScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.detail_export_pro_toast),
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                        if (!isPro) {
+                            onNeedUpgrade()
+                        } else {
+                            runCatching {
+                                val uri = FileProvider.getUriForFile(
+                                    context,
+                                    "${context.packageName}.fileprovider",
+                                    File(event.wavPath),
+                                )
+                                val send = Intent(Intent.ACTION_SEND).apply {
+                                    type = "audio/wav"
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(
+                                    Intent.createChooser(send, context.getString(R.string.detail_export)),
+                                )
+                            }
+                        }
                     },
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(stringResource(R.string.detail_export_pro))
+                    Text(
+                        if (isPro) stringResource(R.string.detail_export)
+                        else stringResource(R.string.detail_export_pro),
+                    )
                 }
                 Button(
                     onClick = onDelete,

@@ -48,6 +48,8 @@
     <string name="detail_title">이벤트 상세</string>
     <string name="detail_moved_badge">⚠ 측정 중 기기 이동 감지</string>
     <string name="detail_plays_today">오늘 재생 %1$d / %2$d회</string>
+    <string name="detail_unlimited_play">무제한 재생</string>
+    <string name="detail_export">↗ 내보내기</string>
     <string name="detail_location">측정 위치</string>
     <string name="detail_map_pending">지도 준비 중</string>
     <string name="detail_tag_section">태그</string>

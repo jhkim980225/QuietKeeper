@@ -46,24 +46,34 @@ fun PaywallScreen(onBack: () -> Unit, onSubscribe: () -> Unit, isPro: Boolean) {
         TextButton(onClick = onBack) { Text("← " + stringResource(R.string.back)) }
         Spacer(Modifier.height(8.dp))
 
-        // Title — long-press toggles debug Pro (unobtrusive dev affordance).
+        // Title — in DEBUG builds, a long-press toggles the debug Pro override
+        // (unobtrusive dev affordance). In release builds there is no UI path
+        // to flip Pro, so the long-press handler and hint are compiled out.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.paywall_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
-                modifier = Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { ProStatus.toggleDebugPro(context) },
-                    )
-                },
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                stringResource(R.string.paywall_debug_hint),
-                style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary,
-            )
+            if (com.quietkeeper.app.BuildConfig.DEBUG) {
+                Text(
+                    text = stringResource(R.string.paywall_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = TextPrimary,
+                    modifier = Modifier.pointerInput(Unit) {
+                        detectTapGestures(
+                            onLongPress = { ProStatus.toggleDebugPro(context) },
+                        )
+                    },
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.paywall_debug_hint),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextSecondary,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.paywall_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = TextPrimary,
+                )
+            }
         }
         Spacer(Modifier.height(4.dp))
         Text(
