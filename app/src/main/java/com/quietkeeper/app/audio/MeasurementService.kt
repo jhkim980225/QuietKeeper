@@ -34,7 +34,8 @@ class MeasurementService : Service(), AudioEngine.Listener {
     private lateinit var db: AppDatabase
     private var isRunning = false
     private var sessionStart = 0L
-    private var eventCount = 0
+    // Incremented on the engine worker thread, read on the polling loop → @Volatile for visibility.
+    @Volatile private var eventCount = 0
 
     // Captured once per session (best-effort). Stamped onto each saved event.
     @Volatile private var sessionFix: LocationProvider.Fix? = null

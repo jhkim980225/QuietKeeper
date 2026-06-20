@@ -88,14 +88,15 @@ fun EventDetailScreen(
         runCatching {
             player.reset()
             player.setDataSource(event.wavPath)
-            player.prepare()
-            player.start()
-            isPlaying = true
+            // Async prepare: never block the main thread on I/O; start on the prepared callback.
+            player.prepareAsync()
         }
     }
 
     DisposableEffect(Unit) {
+        player.setOnPreparedListener { it.start(); isPlaying = true }
         player.setOnCompletionListener { isPlaying = false }
+        player.setOnErrorListener { _, _, _ -> isPlaying = false; true }
         onDispose { runCatching { player.release() } }
     }
 

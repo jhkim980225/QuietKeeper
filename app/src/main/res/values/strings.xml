@@ -57,7 +57,6 @@
     <string name="measure_location_coords">Coordinates %1$f, %2$f</string>
     <string name="detail_tag_section">Tag</string>
     <string name="detail_add_tag">+ Add tag</string>
-    <string name="detail_ai_suggest">🤖 AI suggestion</string>
     <string name="ai_suggest">🤖 AI suggest</string>
     <string name="detail_note_section">Note</string>
     <string name="detail_note_hint">Write a note</string>

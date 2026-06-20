@@ -58,8 +58,24 @@ object LocationProvider {
                 val cts = CancellationTokenSource()
                 cont.invokeOnCancellation { cts.cancel() }
                 client.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
-                    .addOnSuccessListener { loc -> if (cont.isActive) cont.resume(loc) }
-                    .addOnFailureListener { if (cont.isActive) cont.resume(null) }
+                    .addOnSuccessListener { loc ->
+                        if (!cont.isActive) return@addOnSuccessListener
+                        // getCurrentLocation can resolve null (e.g. cold provider, emulator).
+                        // Fall back to the last known location before giving up.
+                        if (loc != null) {
+                            cont.resume(loc)
+                        } else {
+                            client.lastLocation
+                                .addOnSuccessListener { last -> if (cont.isActive) cont.resume(last) }
+                                .addOnFailureListener { if (cont.isActive) cont.resume(null) }
+                        }
+                    }
+                    .addOnFailureListener {
+                        if (!cont.isActive) return@addOnFailureListener
+                        client.lastLocation
+                            .addOnSuccessListener { last -> if (cont.isActive) cont.resume(last) }
+                            .addOnFailureListener { if (cont.isActive) cont.resume(null) }
+                    }
             } catch (se: SecurityException) {
                 if (cont.isActive) cont.resume(null)
             } catch (t: Throwable) {
