@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">QuietKeeper</string>
+    <string name="measure_title">Measure</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="view_events">View events</string>
+    <string name="leq">Leq</string>
+    <string name="lmax">Lmax</string>
+    <string name="dba">dB(A)</string>
+    <string name="events_title">Saved noise events</string>
+    <string name="events_empty">No saved events</string>
+    <string name="back">Back</string>
+    <string name="notif_measuring_title">Measuring noise</string>
+    <string name="notif_channel_name">Measurement</string>
+</resources>

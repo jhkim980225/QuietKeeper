@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">QuietKeeper</string>
+    <string name="measure_title">측정</string>
+    <string name="start">측정 시작</string>
+    <string name="stop">측정 정지</string>
+    <string name="view_events">이벤트 보기</string>
+    <string name="leq">Leq</string>
+    <string name="lmax">Lmax</string>
+    <string name="dba">dB(A)</string>
+    <string name="events_title">저장된 소음 이벤트</string>
+    <string name="events_empty">저장된 이벤트가 없습니다</string>
+    <string name="back">측정 화면</string>
+    <string name="notif_measuring_title">소음 측정 중</string>
+    <string name="notif_channel_name">측정</string>
+</resources>

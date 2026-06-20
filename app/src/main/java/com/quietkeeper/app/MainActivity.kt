@@ -2,20 +2,16 @@ package com.quietkeeper.app
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.core.content.ContextCompat
 import com.quietkeeper.app.audio.MeasurementService
-import com.quietkeeper.app.data.AppDatabase
-import com.quietkeeper.app.data.NoiseEvent
-import com.quietkeeper.app.ui.EventListScreen
-import com.quietkeeper.app.ui.MeasureScreen
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.quietkeeper.app.ui.AppNav
+import com.quietkeeper.app.ui.theme.QuietKeeperTheme
 
 class MainActivity : ComponentActivity() {
     private val perms = registerForActivityResult(
@@ -28,34 +24,26 @@ class MainActivity : ComponentActivity() {
             perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
         }
         setContent {
-            MaterialTheme {
+            QuietKeeperTheme {
                 Surface {
-                    var showEvents by remember { mutableStateOf(false) }
-                    var events by remember { mutableStateOf(emptyList<NoiseEvent>()) }
-                    if (showEvents) {
-                        LaunchedEffect(Unit) {
-                            events = withContext(Dispatchers.IO) {
-                                AppDatabase.getInstance(applicationContext).noiseEventDao().getAll()
-                            }
-                        }
-                        EventListScreen(events = events, onBack = { showEvents = false })
-                    } else {
-                        MeasureScreen(
-                            onStart = {
-                            if (androidx.core.content.ContextCompat.checkSelfPermission(
-                                    this@MainActivity, Manifest.permission.RECORD_AUDIO
-                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                                startForegroundService(Intent(this@MainActivity, MeasurementService::class.java))
-                            } else {
-                                perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
-                            }
+                    AppNav(
+                        onStartService = { startMeasurement() },
+                        onStopService = {
+                            stopService(Intent(this@MainActivity, MeasurementService::class.java))
                         },
-                            onStop = { stopService(Intent(this@MainActivity, MeasurementService::class.java)) },
-                            onShowEvents = { showEvents = true }
-                        )
-                    }
+                    )
                 }
             }
+        }
+    }
+
+    private fun startMeasurement() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            startForegroundService(Intent(this, MeasurementService::class.java))
+        } else {
+            perms.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS))
         }
     }
 }

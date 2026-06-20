@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.quietkeeper.app.R
 import com.quietkeeper.app.data.AppDatabase
 import com.quietkeeper.app.data.NoiseEvent
 import com.quietkeeper.app.sensor.MovementDetector
@@ -33,8 +34,10 @@ class MeasurementService : Service(), AudioEngine.Listener {
     private var isRunning = false
 
     companion object {
-        private val _metrics = MutableStateFlow(floatArrayOf(-120f, -120f, -120f)) // [db, leq, lmax]
-        val metrics: StateFlow<FloatArray> = _metrics
+        private val _metrics = MutableStateFlow(Metrics())
+        val metrics: StateFlow<Metrics> = _metrics
+        private val _running = MutableStateFlow(false)
+        val running: StateFlow<Boolean> = _running
         private const val CHANNEL_ID = "measurement"
         private const val NOTIF_ID = 1
         // TODO: replace with real external-mic calibration offset (placeholder).
@@ -56,9 +59,11 @@ class MeasurementService : Service(), AudioEngine.Listener {
         MovementDetector.reset()
         MovementDetector.start(this)
         engine.start(outDir, CALIBRATION_OFFSET, THRESHOLD_DB)
+        _running.value = true
         scope.launch {
             while (isActive) {
-                _metrics.value = engine.poll()
+                val p = engine.poll()
+                _metrics.value = Metrics(p[0], p[1], p[2])
                 delay(125)
             }
         }
@@ -82,7 +87,8 @@ class MeasurementService : Service(), AudioEngine.Listener {
 
     override fun onDestroy() {
         isRunning = false
-        _metrics.value = floatArrayOf(-120f, -120f, -120f)
+        _metrics.value = Metrics()
+        _running.value = false
         scope.cancel()
         engine.stop()
         MovementDetector.stop()
@@ -95,11 +101,15 @@ class MeasurementService : Service(), AudioEngine.Listener {
         val mgr = getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mgr.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "측정", NotificationManager.IMPORTANCE_LOW)
+                NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.notif_channel_name),
+                    NotificationManager.IMPORTANCE_LOW
+                )
             )
         }
         val notif: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("소음 측정 중")
+            .setContentTitle(getString(R.string.notif_measuring_title))
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
             .setOngoing(true)
             .build()
