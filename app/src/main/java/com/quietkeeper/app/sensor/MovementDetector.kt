@@ -1,4 +1,4 @@
-package com.noisemeter.app.sensor
+package com.quietkeeper.app.sensor
 
 import android.content.Context
 import android.hardware.Sensor

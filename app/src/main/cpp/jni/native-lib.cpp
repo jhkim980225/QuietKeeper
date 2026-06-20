@@ -32,7 +32,7 @@ static void emitEvent(const std::string& path, float peak, float leq) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_noisemeter_app_audio_AudioEngine_nativeStart(JNIEnv* env, jobject /*thiz*/,
+Java_com_quietkeeper_app_audio_AudioEngine_nativeStart(JNIEnv* env, jobject /*thiz*/,
         jstring outDir, jfloat offset, jfloat threshold, jobject listener) {
     // Defensive: if start is called again without stop, tear down the previous session first.
     if (gSource) { gSource->stop(); gSource.reset(); }
@@ -48,7 +48,7 @@ Java_com_noisemeter_app_audio_AudioEngine_nativeStart(JNIEnv* env, jobject /*thi
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_noisemeter_app_audio_AudioEngine_nativeStop(JNIEnv* env, jobject /*thiz*/) {
+Java_com_quietkeeper_app_audio_AudioEngine_nativeStop(JNIEnv* env, jobject /*thiz*/) {
     if (gSource) { gSource->stop(); gSource.reset(); }   // stop callbacks BEFORE destroying engine
     if (gEngine) { gEngine.reset(); }                    // destructor joins worker
     if (gListener) { env->DeleteGlobalRef(gListener); gListener = nullptr; }
@@ -56,7 +56,7 @@ Java_com_noisemeter_app_audio_AudioEngine_nativeStop(JNIEnv* env, jobject /*thiz
 
 // returns float[3] = {db, leq, lmax}
 extern "C" JNIEXPORT jfloatArray JNICALL
-Java_com_noisemeter_app_audio_AudioEngine_nativePoll(JNIEnv* env, jobject /*thiz*/) {
+Java_com_quietkeeper_app_audio_AudioEngine_nativePoll(JNIEnv* env, jobject /*thiz*/) {
     engine::Metrics m = gEngine ? gEngine->latest() : engine::Metrics{};
     jfloatArray arr = env->NewFloatArray(3);
     float vals[3] = { m.db, m.leq, m.lmax };

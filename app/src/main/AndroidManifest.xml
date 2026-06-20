@@ -8,7 +8,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="NoiseMeter"
+        android:label="QuietKeeper"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 

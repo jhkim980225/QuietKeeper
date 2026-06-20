@@ -1,4 +1,4 @@
-package com.noisemeter.app.data
+package com.quietkeeper.app.data
 import androidx.room.*
 
 @Dao

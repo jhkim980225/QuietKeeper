@@ -1,4 +1,4 @@
-package com.noisemeter.app.data
+package com.quietkeeper.app.data
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room

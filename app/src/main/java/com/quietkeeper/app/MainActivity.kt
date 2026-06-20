@@ -1,4 +1,4 @@
-package com.noisemeter.app
+package com.quietkeeper.app
 
 import android.Manifest
 import android.content.Intent
@@ -9,11 +9,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import com.noisemeter.app.audio.MeasurementService
-import com.noisemeter.app.data.AppDatabase
-import com.noisemeter.app.data.NoiseEvent
-import com.noisemeter.app.ui.EventListScreen
-import com.noisemeter.app.ui.MeasureScreen
+import com.quietkeeper.app.audio.MeasurementService
+import com.quietkeeper.app.data.AppDatabase
+import com.quietkeeper.app.data.NoiseEvent
+import com.quietkeeper.app.ui.EventListScreen
+import com.quietkeeper.app.ui.MeasureScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

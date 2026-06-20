@@ -1,4 +1,4 @@
-package com.noisemeter.app.audio
+package com.quietkeeper.app.audio
 
 class AudioEngine(private val listener: Listener) {
     interface Listener { fun onEvent(wavPath: String, peakDb: Float, leq: Float) }

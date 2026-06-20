@@ -1,2 +1,2 @@
 #pragma once
-// JNI bridge between Kotlin (com.noisemeter.app) and the audiocore engine.
+// JNI bridge between Kotlin (com.quietkeeper.app) and the audiocore engine.

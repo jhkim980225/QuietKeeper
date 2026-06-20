@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.noisemeter.app"
+    namespace = "com.quietkeeper.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.noisemeter.app"
+        applicationId = "com.quietkeeper.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

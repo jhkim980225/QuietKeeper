@@ -1,4 +1,4 @@
-package com.noisemeter.app.ui
+package com.quietkeeper.app.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,7 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.noisemeter.app.data.NoiseEvent
+import com.quietkeeper.app.data.NoiseEvent
 
 @Composable
 fun EventListScreen(events: List<NoiseEvent>, onBack: () -> Unit) {

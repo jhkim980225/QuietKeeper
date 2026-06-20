@@ -1,4 +1,4 @@
-package com.noisemeter.app.audio
+package com.quietkeeper.app.audio
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,9 +10,9 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import com.noisemeter.app.data.AppDatabase
-import com.noisemeter.app.data.NoiseEvent
-import com.noisemeter.app.sensor.MovementDetector
+import com.quietkeeper.app.data.AppDatabase
+import com.quietkeeper.app.data.NoiseEvent
+import com.quietkeeper.app.sensor.MovementDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

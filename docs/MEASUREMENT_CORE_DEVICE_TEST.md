@@ -19,8 +19,8 @@ the UNPROCESSED audio preset).
    - `android.permission.POST_NOTIFICATIONS`
    Alternatively grant via adb:
    ```
-   adb shell pm grant com.noisemeter.app android.permission.RECORD_AUDIO
-   adb shell pm grant com.noisemeter.app android.permission.POST_NOTIFICATIONS
+   adb shell pm grant com.quietkeeper.app android.permission.RECORD_AUDIO
+   adb shell pm grant com.quietkeeper.app android.permission.POST_NOTIFICATIONS
    ```
 
 ## A — Real-time level display
@@ -38,7 +38,7 @@ the UNPROCESSED audio preset).
 2. Stop making the sound.
 3. Pull the events directory from the device:
    ```
-   adb pull /sdcard/Android/data/com.noisemeter.app/files/events/ ./pulled_events/
+   adb pull /sdcard/Android/data/com.quietkeeper.app/files/events/ ./pulled_events/
    ```
 4. **Pass:**
    - At least one `event_*.wav` file is present.
@@ -57,7 +57,7 @@ the UNPROCESSED audio preset).
 1. Start the service and leave it running continuously for **30+ minutes** with ambient
    sound present.
 2. Monitor in Android Studio Profiler (Memory tab):
-   - Attach to `com.noisemeter.app`.
+   - Attach to `com.quietkeeper.app`.
    - Watch Heap (Java + Native) over time.
 3. **Pass:**
    - No `FATAL EXCEPTION` or `ANR` in `adb logcat`.
