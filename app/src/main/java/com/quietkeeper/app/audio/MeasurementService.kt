@@ -98,9 +98,10 @@ class MeasurementService : Service(), AudioEngine.Listener {
         eventCount++
         scope.launch {
             withContext(NonCancellable) {
+                val timestamp = System.currentTimeMillis()
                 val id = db.noiseEventDao().insert(
                     NoiseEvent(
-                        timestamp = System.currentTimeMillis(),
+                        timestamp = timestamp,
                         peakDb = peakDb, leq = leq, wavPath = wavPath,
                         moved = MovementDetector.movedFlag, tag = null, note = null,
                         latitude = sessionFix?.lat,
@@ -112,9 +113,22 @@ class MeasurementService : Service(), AudioEngine.Listener {
                 // store it only if the user hasn't already set a tag. Behind the
                 // Ai.classifier seam so a real model swaps in without touching this.
                 val ai = com.quietkeeper.app.ai.Ai.classifier.classify(wavPath, peakDb)
-                val saved = db.noiseEventDao().getById(id)
+                var saved = db.noiseEventDao().getById(id)
                 if (saved != null && saved.tag.isNullOrBlank()) {
-                    db.noiseEventDao().update(saved.copy(tag = ai.tag))
+                    saved = saved.copy(tag = ai.tag)
+                    db.noiseEventDao().update(saved)
+                }
+                // Integrity hash: timestamp + device id + wav path + peak dB -> SHA-256.
+                // Store it on the event and (best-effort) push to the cloud sync seam.
+                // Cloud.sync is the dummy LocalCloudSync until a real FirebaseCloudSync swaps in.
+                val deviceId = android.provider.Settings.Secure.getString(
+                    contentResolver, android.provider.Settings.Secure.ANDROID_ID
+                ) ?: "unknown"
+                val hash = com.quietkeeper.app.cloud.IntegrityHash.of(timestamp, deviceId, wavPath, peakDb)
+                saved?.let { ev ->
+                    val withHash = ev.copy(integrityHash = hash)
+                    db.noiseEventDao().update(withHash)
+                    com.quietkeeper.app.cloud.Cloud.sync.syncEvent(withHash, hash)
                 }
             }
         }

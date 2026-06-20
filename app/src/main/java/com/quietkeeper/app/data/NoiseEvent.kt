@@ -15,4 +15,5 @@ data class NoiseEvent(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val address: String? = null,
+    val integrityHash: String? = null,
 )

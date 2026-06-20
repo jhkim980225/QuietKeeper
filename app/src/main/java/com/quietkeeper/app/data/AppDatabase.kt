@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [NoiseEvent::class], version = 2, exportSchema = false)
+@Database(entities = [NoiseEvent::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun noiseEventDao(): NoiseEventDao
     companion object {
@@ -22,11 +22,19 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // v2 -> v3: add nullable integrityHash column (SHA-256 tamper-evidence).
+        // Real ALTER TABLE so existing event data survives the upgrade (no destructive fallback).
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE noise_events ADD COLUMN integrityHash TEXT")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext, AppDatabase::class.java, "noise.db"
-                ).addMigrations(MIGRATION_1_2).build().also { INSTANCE = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { INSTANCE = it }
             }
     }
 }
