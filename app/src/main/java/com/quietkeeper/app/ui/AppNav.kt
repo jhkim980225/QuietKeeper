@@ -66,12 +66,6 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
                 onOpen = { id -> nav.navigate("detail/$id") },
             )
         }
-        composable("prep") {
-            PrepScreen(onStart = {
-                onStartService()
-                nav.navigate("home")
-            })
-        }
         composable("save") {
             SaveScreen(
                 summary = SessionStore.last,
@@ -146,13 +140,22 @@ private fun HomeScreen(
     onShowPaywall: () -> Unit,
 ) {
     // Observe running state so the home screen recomposes with service lifecycle.
+    // Idle → Prep (status checks + start); Measuring → live gauge.
     val running by com.quietkeeper.app.audio.MeasurementService.running
         .collectAsStateWithLifecycle()
-    MeasureScreen(
-        running = running,
-        onStart = onStart,
-        onStop = onStop,
-        onShowEvents = onShowEvents,
-        onShowPaywall = onShowPaywall,
-    )
+    if (running) {
+        MeasureScreen(
+            running = true,
+            onStart = onStart,
+            onStop = onStop,
+            onShowEvents = onShowEvents,
+            onShowPaywall = onShowPaywall,
+        )
+    } else {
+        PrepScreen(
+            onStart = onStart,
+            onShowEvents = onShowEvents,
+            onShowPaywall = onShowPaywall,
+        )
+    }
 }

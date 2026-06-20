@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +24,29 @@ import com.quietkeeper.app.ui.theme.TextPrimary
 import com.quietkeeper.app.ui.theme.TextSecondary
 
 @Composable
-fun PrepScreen(onStart: () -> Unit) {
+fun PrepScreen(
+    onStart: () -> Unit,
+    onShowEvents: () -> Unit = {},
+    onShowPaywall: () -> Unit = {},
+) {
     ScreenScaffold(title = stringResource(R.string.prep_title)) {
         Column(Modifier.fillMaxWidth()) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onShowEvents) {
+                    Text(stringResource(R.string.view_events))
+                }
+                TextButton(onClick = onShowPaywall) {
+                    Text(
+                        stringResource(R.string.pro_entry),
+                        color = com.quietkeeper.app.ui.theme.Primary,
+                    )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
             StatusRow("🎙", stringResource(R.string.prep_mic))
             Spacer(Modifier.height(12.dp))
             StatusRow("🔧", stringResource(R.string.prep_calibration))
