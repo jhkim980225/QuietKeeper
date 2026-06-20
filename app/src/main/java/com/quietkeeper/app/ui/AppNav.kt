@@ -15,16 +15,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.quietkeeper.app.audio.MeasurementService
 import com.quietkeeper.app.data.AppDatabase
 import com.quietkeeper.app.data.NoiseEvent
 import com.quietkeeper.app.ui.theme.ScreenScaffold
 import com.quietkeeper.app.ui.theme.TextPrimary
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @Composable
 fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
@@ -52,7 +56,11 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
                     AppDatabase.getInstance(context).noiseEventDao().getAll()
                 }
             }
-            EventListScreen(events = events, onBack = { nav.popBackStack() })
+            EventListScreen(
+                events = events,
+                onBack = { nav.popBackStack() },
+                onOpen = { id -> nav.navigate("detail/$id") },
+            )
         }
         composable("prep") {
             PrepScreen(onStart = {
@@ -71,7 +79,46 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
                 onDiscard = { nav.popBackStack("home", false) },
             )
         }
-        composable("detail/{eventId}") { PlaceholderScreen("Detail") }
+        composable(
+            "detail/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val context = LocalContext.current
+            val scope = androidx.compose.runtime.rememberCoroutineScope()
+            val id = backStackEntry.arguments?.getString("eventId")?.toLongOrNull()
+            var event by remember { mutableStateOf<NoiseEvent?>(null) }
+            androidx.compose.runtime.LaunchedEffect(id) {
+                if (id != null) {
+                    event = withContext(Dispatchers.IO) {
+                        AppDatabase.getInstance(context).noiseEventDao().getById(id)
+                    }
+                }
+            }
+            event?.let { ev ->
+                EventDetailScreen(
+                    event = ev,
+                    onBack = { nav.popBackStack() },
+                    onSaveNote = { tag, note ->
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                AppDatabase.getInstance(context).noiseEventDao()
+                                    .update(ev.copy(tag = tag, note = note))
+                            }
+                            nav.popBackStack()
+                        }
+                    },
+                    onDelete = {
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                AppDatabase.getInstance(context).noiseEventDao().delete(ev)
+                                runCatching { File(ev.wavPath).delete() }
+                            }
+                            nav.popBackStack()
+                        }
+                    },
+                )
+            }
+        }
         composable("paywall") { PlaceholderScreen("Paywall") }
     }
 }

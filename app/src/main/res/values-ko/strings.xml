@@ -39,4 +39,19 @@
     <string name="save_button">저장</string>
     <string name="save_discard">저장 안 함(삭제)</string>
     <string name="unit_events">%1$d건</string>
+    <!-- Event detail screen -->
+    <string name="detail_title">이벤트 상세</string>
+    <string name="detail_moved_badge">⚠ 측정 중 기기 이동 감지</string>
+    <string name="detail_plays_today">오늘 재생 %1$d / %2$d회</string>
+    <string name="detail_location">측정 위치</string>
+    <string name="detail_map_pending">지도 준비 중</string>
+    <string name="detail_tag_section">태그</string>
+    <string name="detail_add_tag">+ 태그 추가</string>
+    <string name="detail_ai_suggest">🤖 AI 추천</string>
+    <string name="detail_note_section">노트</string>
+    <string name="detail_note_hint">노트를 입력하세요</string>
+    <string name="detail_save">저장</string>
+    <string name="detail_export_pro">↗ 내보내기 (프로)</string>
+    <string name="detail_export_pro_toast">프로 전용</string>
+    <string name="detail_delete">삭제</string>
 </resources>

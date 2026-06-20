@@ -1,5 +1,6 @@
 package com.quietkeeper.app.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +18,7 @@ import com.quietkeeper.app.ui.theme.TextPrimary
 import com.quietkeeper.app.ui.theme.TextSecondary
 
 @Composable
-fun EventListScreen(events: List<NoiseEvent>, onBack: () -> Unit) {
+fun EventListScreen(events: List<NoiseEvent>, onBack: () -> Unit, onOpen: (Long) -> Unit) {
     ScreenScaffold(title = stringResource(R.string.events_title)) {
         TextButton(onClick = onBack) { Text("← " + stringResource(R.string.back)) }
         Spacer(Modifier.height(8.dp))
@@ -33,7 +34,7 @@ fun EventListScreen(events: List<NoiseEvent>, onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(events) { e ->
-                    GlassCard(Modifier.fillMaxWidth()) {
+                    GlassCard(Modifier.fillMaxWidth().clickable { onOpen(e.id) }) {
                         Text(
                             "${e.peakDb.toInt()} " + stringResource(R.string.dba),
                             style = MaterialTheme.typography.displayMedium,

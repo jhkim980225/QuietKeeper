@@ -39,4 +39,19 @@
     <string name="save_button">Save</string>
     <string name="save_discard">Don\'t save (delete)</string>
     <string name="unit_events">%1$d</string>
+    <!-- Event detail screen -->
+    <string name="detail_title">Event detail</string>
+    <string name="detail_moved_badge">⚠ Device movement detected during measurement</string>
+    <string name="detail_plays_today">Plays today %1$d / %2$d</string>
+    <string name="detail_location">Measurement location</string>
+    <string name="detail_map_pending">Map coming soon</string>
+    <string name="detail_tag_section">Tag</string>
+    <string name="detail_add_tag">+ Add tag</string>
+    <string name="detail_ai_suggest">🤖 AI suggestion</string>
+    <string name="detail_note_section">Note</string>
+    <string name="detail_note_hint">Write a note</string>
+    <string name="detail_save">Save</string>
+    <string name="detail_export_pro">↗ Export (Pro)</string>
+    <string name="detail_export_pro_toast">Pro only</string>
+    <string name="detail_delete">Delete</string>
 </resources>
