@@ -15,6 +15,7 @@ import com.quietkeeper.app.data.AppDatabase
 import com.quietkeeper.app.data.NoiseEvent
 import com.quietkeeper.app.location.LocationProvider
 import com.quietkeeper.app.sensor.MovementDetector
+import com.quietkeeper.app.streaming.LocalStreamServer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -32,6 +33,9 @@ class MeasurementService : Service(), AudioEngine.Listener {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val engine = AudioEngine(this)
     private lateinit var db: AppDatabase
+    // Embedded LAN streaming server: serves saved event WAVs to viewers on the same WiFi while
+    // the measurement device is running. Started after the engine, stopped in onDestroy.
+    private var streamServer: LocalStreamServer? = null
     private var isRunning = false
     private var sessionStart = 0L
     // Incremented on the engine worker thread, read on the polling loop → @Volatile for visibility.
@@ -75,6 +79,11 @@ class MeasurementService : Service(), AudioEngine.Listener {
         MovementDetector.reset()
         MovementDetector.start(this)
         engine.start(outDir, CALIBRATION_OFFSET, THRESHOLD_DB)
+        // Start the LAN streaming server so same-WiFi viewers can stream saved WAVs while the
+        // measurement device is on. Never crashes if the port is busy.
+        if (streamServer == null) {
+            streamServer = LocalStreamServer(applicationContext).also { it.startSafely() }
+        }
         sessionStart = System.currentTimeMillis()
         eventCount = 0
         _running.value = true
@@ -141,6 +150,8 @@ class MeasurementService : Service(), AudioEngine.Listener {
         _running.value = false
         scope.cancel()
         engine.stop()
+        streamServer?.stop()
+        streamServer = null
         MovementDetector.stop()
         super.onDestroy()
     }

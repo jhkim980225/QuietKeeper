@@ -100,6 +100,9 @@ dependencies {
     implementation("com.android.billingclient:billing-ktx:7.1.1")
     implementation("com.google.android.gms:play-services-ads:23.5.0")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Embedded LAN streaming server for serving saved event WAVs to viewers on the same WiFi.
+    implementation("org.nanohttpd:nanohttpd:2.3.1")
     androidTestImplementation("androidx.room:room-testing:2.6.1")
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
