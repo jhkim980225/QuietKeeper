@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.quietkeeper.app.audio.MeasurementService
 import com.quietkeeper.app.data.AppDatabase
 import com.quietkeeper.app.data.NoiseEvent
 import com.quietkeeper.app.ui.theme.ScreenScaffold
@@ -35,7 +36,11 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
         composable("home") {
             HomeScreen(
                 onStart = onStartService,
-                onStop = onStopService,
+                onStop = {
+                    SessionStore.last = MeasurementService.summary.value
+                    onStopService()
+                    nav.navigate("save")
+                },
                 onShowEvents = { nav.navigate("events") },
             )
         }
@@ -49,8 +54,23 @@ fun AppNav(onStartService: () -> Unit, onStopService: () -> Unit) {
             }
             EventListScreen(events = events, onBack = { nav.popBackStack() })
         }
-        composable("prep") { PlaceholderScreen("Prepare") }
-        composable("save") { PlaceholderScreen("Save") }
+        composable("prep") {
+            PrepScreen(onStart = {
+                onStartService()
+                nav.navigate("home")
+            })
+        }
+        composable("save") {
+            SaveScreen(
+                summary = SessionStore.last,
+                onSave = { _, _ ->
+                    // Persisting the memo onto the session is Phase-later; the
+                    // over-threshold events are already saved by the engine.
+                    nav.popBackStack("home", false)
+                },
+                onDiscard = { nav.popBackStack("home", false) },
+            )
+        }
         composable("detail/{eventId}") { PlaceholderScreen("Detail") }
         composable("paywall") { PlaceholderScreen("Paywall") }
     }

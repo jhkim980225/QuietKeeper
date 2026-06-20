@@ -13,4 +13,30 @@
     <string name="back">Back</string>
     <string name="notif_measuring_title">Measuring noise</string>
     <string name="notif_channel_name">Measurement</string>
+    <!-- Prep screen -->
+    <string name="prep_title">Measurement setup</string>
+    <string name="prep_mic">External mic connected</string>
+    <string name="prep_calibration">Calibration applied</string>
+    <string name="prep_level">Device fixed (level)</string>
+    <string name="prep_ok">OK</string>
+    <string name="prep_threshold_label">Measurement threshold</string>
+    <string name="prep_threshold_value">55 dB(A)</string>
+    <string name="prep_start">● Start measurement</string>
+    <string name="prep_hint">Do not move the device while measuring.</string>
+    <!-- Measuring screen -->
+    <string name="threshold">Threshold</string>
+    <string name="measuring_pill">Measuring · %1$s</string>
+    <string name="measure_stop">■ Stop measurement</string>
+    <string name="session_events">This session over-threshold events · %1$d</string>
+    <!-- Save screen -->
+    <string name="save_title">Measurement done — save it?</string>
+    <string name="save_duration">Duration</string>
+    <string name="save_events">Over-threshold events</string>
+    <string name="save_max_lmax">Peak Lmax</string>
+    <string name="save_avg_leq">Average Leq</string>
+    <string name="save_memo_hint">Memo</string>
+    <string name="save_keep_audio">Keep over-threshold event audio</string>
+    <string name="save_button">Save</string>
+    <string name="save_discard">Don\'t save (delete)</string>
+    <string name="unit_events">%1$d</string>
 </resources>

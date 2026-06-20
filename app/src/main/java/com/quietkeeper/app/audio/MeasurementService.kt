@@ -32,12 +32,23 @@ class MeasurementService : Service(), AudioEngine.Listener {
     private val engine = AudioEngine(this)
     private lateinit var db: AppDatabase
     private var isRunning = false
+    private var sessionStart = 0L
+    private var eventCount = 0
+
+    data class SessionSummary(
+        val durationMs: Long = 0,
+        val eventCount: Int = 0,
+        val maxLmax: Float = -120f,
+        val avgLeq: Float = -120f,
+    )
 
     companion object {
         private val _metrics = MutableStateFlow(Metrics())
         val metrics: StateFlow<Metrics> = _metrics
         private val _running = MutableStateFlow(false)
         val running: StateFlow<Boolean> = _running
+        private val _summary = MutableStateFlow(SessionSummary())
+        val summary: StateFlow<SessionSummary> = _summary
         private const val CHANNEL_ID = "measurement"
         private const val NOTIF_ID = 1
         // TODO: replace with real external-mic calibration offset (placeholder).
@@ -59,11 +70,16 @@ class MeasurementService : Service(), AudioEngine.Listener {
         MovementDetector.reset()
         MovementDetector.start(this)
         engine.start(outDir, CALIBRATION_OFFSET, THRESHOLD_DB)
+        sessionStart = System.currentTimeMillis()
+        eventCount = 0
         _running.value = true
         scope.launch {
             while (isActive) {
                 val p = engine.poll()
                 _metrics.value = Metrics(p[0], p[1], p[2])
+                _summary.value = SessionSummary(
+                    System.currentTimeMillis() - sessionStart, eventCount, p[2], p[1]
+                )
                 delay(125)
             }
         }
@@ -72,6 +88,7 @@ class MeasurementService : Service(), AudioEngine.Listener {
 
     override fun onEvent(wavPath: String, peakDb: Float, leq: Float) {
         // Called on the engine worker thread (JNI-attached). Persist metadata off the main thread.
+        eventCount++
         scope.launch {
             withContext(NonCancellable) {
                 db.noiseEventDao().insert(

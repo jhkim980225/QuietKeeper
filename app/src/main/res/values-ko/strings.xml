@@ -13,4 +13,30 @@
     <string name="back">측정 화면</string>
     <string name="notif_measuring_title">소음 측정 중</string>
     <string name="notif_channel_name">측정</string>
+    <!-- Prep screen -->
+    <string name="prep_title">측정 준비</string>
+    <string name="prep_mic">외장마이크 연결됨</string>
+    <string name="prep_calibration">캘리브레이션 적용됨</string>
+    <string name="prep_level">기기 고정(수평)</string>
+    <string name="prep_ok">OK</string>
+    <string name="prep_threshold_label">측정 임계값</string>
+    <string name="prep_threshold_value">55 dB(A)</string>
+    <string name="prep_start">● 측정 시작</string>
+    <string name="prep_hint">측정 중에는 기기를 움직이지 마세요.</string>
+    <!-- Measuring screen -->
+    <string name="threshold">임계</string>
+    <string name="measuring_pill">측정 중 · %1$s</string>
+    <string name="measure_stop">■ 측정 정지</string>
+    <string name="session_events">이번 세션 초과 이벤트 · %1$d건</string>
+    <!-- Save screen -->
+    <string name="save_title">측정 완료 — 저장할까요?</string>
+    <string name="save_duration">측정 시간</string>
+    <string name="save_events">초과 이벤트</string>
+    <string name="save_max_lmax">최고 Lmax</string>
+    <string name="save_avg_leq">평균 Leq</string>
+    <string name="save_memo_hint">메모</string>
+    <string name="save_keep_audio">초과 이벤트 원음 함께 보관</string>
+    <string name="save_button">저장</string>
+    <string name="save_discard">저장 안 함(삭제)</string>
+    <string name="unit_events">%1$d건</string>
 </resources>
