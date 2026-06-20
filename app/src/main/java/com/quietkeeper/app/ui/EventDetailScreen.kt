@@ -103,6 +103,10 @@ fun EventDetailScreen(
     var tag by remember { mutableStateOf(event.tag ?: "") }
     var note by remember { mutableStateOf(event.note ?: "") }
 
+    // Last AI suggestion (tag + confidence%), shown after the "AI suggest" chip runs.
+    var aiSuggestion by remember { mutableStateOf<String?>(null) }
+    var aiRunning by remember { mutableStateOf(false) }
+
     ScreenScaffold {
         Column(Modifier.verticalScroll(rememberScrollState())) {
             // Top back bar
@@ -267,8 +271,30 @@ fun EventDetailScreen(
                         modifier = Modifier.clickable { tagAdding = true },
                     )
                 }
-                // AI suggestion placeholder (disabled)
-                Chip(text = stringResource(R.string.detail_ai_suggest), filled = false, faded = true)
+                // Functional AI suggest chip: runs the (dummy) classifier and fills
+                // the tag with its result, behind the Ai.classifier seam.
+                Chip(
+                    text = stringResource(R.string.ai_suggest),
+                    filled = false,
+                    modifier = Modifier.clickable(enabled = !aiRunning) {
+                        scope.launch {
+                            aiRunning = true
+                            val r = com.quietkeeper.app.ai.Ai.classifier
+                                .classify(event.wavPath, event.peakDb)
+                            tag = r.tag
+                            aiSuggestion = "🤖 ${r.tag} (${(r.confidence * 100).toInt()}%)"
+                            aiRunning = false
+                        }
+                    },
+                )
+            }
+            aiSuggestion?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    it,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = TextSecondary,
+                )
             }
             if (tagAdding) {
                 Spacer(Modifier.height(8.dp))

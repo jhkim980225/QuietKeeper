@@ -58,6 +58,7 @@
     <string name="detail_tag_section">태그</string>
     <string name="detail_add_tag">+ 태그 추가</string>
     <string name="detail_ai_suggest">🤖 AI 추천</string>
+    <string name="ai_suggest">🤖 AI 추천</string>
     <string name="detail_note_section">노트</string>
     <string name="detail_note_hint">노트를 입력하세요</string>
     <string name="detail_save">저장</string>

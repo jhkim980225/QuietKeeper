@@ -98,7 +98,7 @@ class MeasurementService : Service(), AudioEngine.Listener {
         eventCount++
         scope.launch {
             withContext(NonCancellable) {
-                db.noiseEventDao().insert(
+                val id = db.noiseEventDao().insert(
                     NoiseEvent(
                         timestamp = System.currentTimeMillis(),
                         peakDb = peakDb, leq = leq, wavPath = wavPath,
@@ -108,6 +108,14 @@ class MeasurementService : Service(), AudioEngine.Listener {
                         address = sessionFix?.address,
                     )
                 )
+                // Auto-tag: ask the (dummy) classifier for a suggested noise type and
+                // store it only if the user hasn't already set a tag. Behind the
+                // Ai.classifier seam so a real model swaps in without touching this.
+                val ai = com.quietkeeper.app.ai.Ai.classifier.classify(wavPath, peakDb)
+                val saved = db.noiseEventDao().getById(id)
+                if (saved != null && saved.tag.isNullOrBlank()) {
+                    db.noiseEventDao().update(saved.copy(tag = ai.tag))
+                }
             }
         }
     }
